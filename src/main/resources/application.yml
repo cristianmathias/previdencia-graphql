@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: previdencia-graphql
+  graphql:
+    graphiql:
+      enabled: true
+
+icatu:
+  base-url: https://api-sandbox.icatuseguros.com.br/relacionamento-parceiro/previdencia/v3
+  ocp-apim-subscription-key: ${ICATU_OCP_APIM_SUBSCRIPTION_KEY:}
+  codigo-empresa: ${ICATU_CODIGO_EMPRESA:}

@@ -1,0 +1,27 @@
+type Query {
+  certificados(
+    idCliente: String!
+    idCertificado: String
+    filtro: CertificadosFiltroInput
+  ): CertificadosPayload!
+}
+
+input CertificadosFiltroInput {
+  formaElegibilidade: String
+  proposta: String
+  cliente: Boolean
+  produtor: String
+  saldoReserva: Boolean
+  periodoAcumuladoInicio: String
+  periodoAcumuladoFim: String
+}
+
+type CertificadosPayload {
+  tipo: CertificadosPayloadTipo!
+  json: String!
+}
+
+enum CertificadosPayloadTipo {
+  LISTA
+  DETALHE
+}
