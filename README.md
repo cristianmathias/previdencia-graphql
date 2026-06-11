@@ -90,6 +90,8 @@ O payload GraphQL retorna:
 | `certificado` | Detalhe tipado retornado por `/clientes/{idcliente}/certificados/{idcertificado}` |
 | `json` | Corpo original da Icatu como string JSON, util para troubleshooting |
 
+Os retornos tipados sao representados no Java por `records` no pacote `br.com.previdencia.graphql.icatu`.
+
 Campos principais disponiveis em `certificados`:
 
 ```graphql

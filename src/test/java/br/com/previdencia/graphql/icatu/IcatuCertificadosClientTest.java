@@ -30,7 +30,7 @@ class IcatuCertificadosClientTest {
                 .assertNext(payload -> {
                     assertThat(payload.tipo()).isEqualTo(CertificadosPayloadTipo.LISTA);
                     assertThat(payload.certificados()).hasSize(1);
-                    assertThat(payload.certificados().getFirst()).containsEntry("numeroCertificado", "000000000001");
+                    assertThat(payload.certificados().getFirst().numeroCertificado()).isEqualTo("000000000001");
                     assertThat(payload.certificado()).isNull();
                     assertThat(payload.json()).contains("numeroCertificado");
                     assertThat(exchange.uri().getPath()).isEqualTo("/relacionamento-parceiro/previdencia/v3/clientes/12345678901/certificados");
@@ -53,7 +53,7 @@ class IcatuCertificadosClientTest {
                 .assertNext(payload -> {
                     assertThat(payload.tipo()).isEqualTo(CertificadosPayloadTipo.DETALHE);
                     assertThat(payload.certificados()).isNull();
-                    assertThat(payload.certificado()).containsEntry("statusCertificado", "ATIVO");
+                    assertThat(payload.certificado().statusCertificado()).isEqualTo("ATIVO");
                     assertThat(payload.json()).contains("ATIVO");
                     assertThat(exchange.uri().getPath()).isEqualTo("/relacionamento-parceiro/previdencia/v3/clientes/12345678901/certificados/000000000001");
                     assertThat(exchange.uri().getQuery()).isNull();

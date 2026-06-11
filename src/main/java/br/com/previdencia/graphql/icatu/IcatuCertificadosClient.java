@@ -3,7 +3,6 @@ package br.com.previdencia.graphql.icatu;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -64,7 +63,7 @@ public class IcatuCertificadosClient {
                 .map(json -> new CertificadosPayload(CertificadosPayloadTipo.DETALHE, null, readObject(json), json));
     }
 
-    private List<Map<String, Object>> readList(String json) {
+    private List<CertificadoResumo> readList(String json) {
         try {
             return objectMapper.readValue(json, new TypeReference<>() {
             });
@@ -73,10 +72,9 @@ public class IcatuCertificadosClient {
         }
     }
 
-    private Map<String, Object> readObject(String json) {
+    private CertificadoDetalhe readObject(String json) {
         try {
-            return objectMapper.readValue(json, new TypeReference<>() {
-            });
+            return objectMapper.readValue(json, CertificadoDetalhe.class);
         } catch (Exception ex) {
             throw new IllegalStateException("Nao foi possivel ler o detalhe do certificado retornado pela Icatu.", ex);
         }
