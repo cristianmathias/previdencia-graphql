@@ -43,7 +43,15 @@ query {
     }
   ) {
     tipo
-    json
+    certificados {
+      numeroCertificado
+      statusCertificado
+      nome
+      saldoValor {
+        dataSaldo
+        total
+      }
+    }
   }
 }
 ```
@@ -57,9 +65,30 @@ query {
     idCertificado: "000000000001"
   ) {
     tipo
-    json
+    certificado {
+      statusCertificado
+      numeroProposta
+      produto {
+        nome
+        plano {
+          tipoPlano
+          beneficios {
+            nome
+            fundos {
+              nome
+              cnpj
+            }
+          }
+        }
+      }
+      participante {
+        nome
+        cpf
+        email
+      }
+    }
   }
 }
 ```
 
-O campo `json` retorna o corpo original da API Icatu como string JSON.
+O campo `json` continua disponivel e retorna o corpo original da API Icatu como string JSON.

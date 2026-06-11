@@ -18,10 +18,228 @@ input CertificadosFiltroInput {
 
 type CertificadosPayload {
   tipo: CertificadosPayloadTipo!
+  certificados: [CertificadoResumo!]
+  certificado: CertificadoDetalhe
   json: String!
 }
 
 enum CertificadosPayloadTipo {
   LISTA
   DETALHE
+}
+
+type CertificadoResumo {
+  nome: String
+  matricula: String
+  numeroCertificado: String
+  statusCertificado: String
+  motivo: [String!]
+  saldoValor: [SaldoValor!]
+}
+
+type SaldoValor {
+  dataSaldo: String
+  total: Float
+  quantidadeCotasTotal: Float
+  valorCotaFechada: Float
+  dataAcumuladaEfetivaInicial: String
+  dataAcumuladaEfetivaFinal: String
+  rentabilidadeAcumulada: Float
+  rendimentoAcumuladoBruto: Float
+}
+
+type CertificadoDetalhe {
+  statusCertificado: String
+  dataCancelamento: String
+  motivoCancelamento: String
+  regimeTributacao: String
+  situacaoRegimeTributacao: String
+  numeroProposta: String
+  numeroContrato: String
+  tipoCertificado: String
+  dataImplantacao: String
+  dataInicio: String
+  dataFimDiferimento: String
+  statusFaturamento: String
+  dataProximoReajusteContribuicao: String
+  idadeAposentadoria: Int
+  participante: Participante
+  empresa: Empresa
+  enderecoCorrespondencia: EnderecoCorrespondencia
+  representanteLegal: RepresentanteLegal
+  responsavelFinanceiro: ResponsavelFinanceiro
+  parceiro: Parceiro
+  produto: Produto
+  dadosComercializacao: [DadosComercializacao!]
+  pontoVenda: PontoVenda
+  sucursal: Sucursal
+}
+
+type Participante {
+  nomeSocial: String
+  nome: String
+  cpf: String
+  email: String
+  telefone: String
+  dataNascimento: String
+  sexo: String
+  valorPatrimonio: Float
+  liberaAcessoSaldo: Boolean
+  estadoCivil: String
+  nacionalidades: [String!]
+  cidadaoAmericano: Boolean
+  paisNascimento: String
+  paisResidencia: String
+  paisResidenciaFiscal: PaisResidenciaFiscal
+  documento: Documento
+  informacaoProfissional: InformacaoProfissional
+}
+
+type PaisResidenciaFiscal {
+  pais: String
+  nif: String
+  motivoNaoNif: String
+}
+
+type Documento {
+  tipo: String
+  numero: String
+  orgaoExpedidor: String
+  dataEmissao: String
+}
+
+type InformacaoProfissional {
+  codigo: Int
+  nome: String
+}
+
+type Empresa {
+  numeroContrato: String
+  nome: String
+  cnpj: String
+  dataAdmissao: String
+  matriculaFuncionario: String
+  salario: Float
+  dataDesligamento: String
+  motivoDesligamento: String
+  reservaLiberada: String
+  situacaoFuncionario: String
+}
+
+type EnderecoCorrespondencia {
+  apelido: String
+  logradouro: String
+  bairro: String
+  cidade: String
+  uf: String
+  cep: String
+}
+
+type RepresentanteLegal {
+  nome: String
+  grauParentesco: String
+  cpf: String
+  dataNascimento: String
+}
+
+type ResponsavelFinanceiro {
+  nome: String
+  dataNascimento: String
+  cpf: String
+  paisResidencia: String
+}
+
+type Parceiro {
+  idParceiro: String
+  parceria: Parceria
+}
+
+type Parceria {
+  codigo: String
+  nome: String
+}
+
+type Produto {
+  codigo: String
+  nome: String
+  nomeComercial: String
+  modalidadeContratacao: String
+  plano: Plano
+}
+
+type Plano {
+  numeroSUSEP: String
+  nome: String
+  tipoPlano: String
+  beneficios: [Beneficio!]
+}
+
+type Beneficio {
+  codigo: String
+  nome: String
+  tipo: String
+  indiceAtualizacaoMonetaria: String
+  periodicidadeAtualizacao: String
+  tabuaAtuarial: String
+  tipoRenda: String
+  garantiaRenda: String
+  fatorAtualDeRenda: String
+  fundos: [Fundo!]
+  tipoContas: [TipoConta!]
+}
+
+type TipoConta {
+  codigo: String
+  descricao: String
+  patrocinio: String
+  fundos: [Fundo!]
+}
+
+type Fundo {
+  codigo: String
+  nome: String
+  cnpj: String
+  estrategiaFundo: String
+  taxaAdministracao: TaxaAdministracao
+  taxaPerformance: String
+  limiteMaximoTaxaPerformance: String
+  tipoFundo: String
+  prazoCotizacaoAplicacao: Int
+  prazoCotizacaoResgate: Int
+  prazoLiquidacaoResgate: Int
+  prazoPagamentoResgate: Int
+}
+
+type TaxaAdministracao {
+  minima: Float
+  maxima: Float
+}
+
+type DadosComercializacao {
+  comissionado: String
+  bairro: String
+  cep: String
+  cidade: String
+  cnpj: String
+  cpf: String
+  email: String
+  endereco: String
+  inscricaoSUSEP: String
+  telefone: String
+  tipoComissionado: String
+  uf: String
+  codigoProdutor: String
+  papel: String
+}
+
+type PontoVenda {
+  codigoUnidadeProdutora: Int
+  nomeUnidadeProdutora: String
+  codigoPontoAtendimento: Int
+  nomePontoAtendimento: String
+}
+
+type Sucursal {
+  codigo: String
+  descricao: String
 }

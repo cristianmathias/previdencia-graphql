@@ -1,5 +1,9 @@
 package br.com.previdencia.graphql.icatu;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -10,9 +14,11 @@ import reactor.core.publisher.Mono;
 public class IcatuCertificadosClient {
 
     private final WebClient icatuWebClient;
+    private final ObjectMapper objectMapper;
 
-    public IcatuCertificadosClient(WebClient icatuWebClient) {
+    public IcatuCertificadosClient(WebClient icatuWebClient, ObjectMapper objectMapper) {
         this.icatuWebClient = icatuWebClient;
+        this.objectMapper = objectMapper;
     }
 
     public Mono<CertificadosPayload> buscar(String idCliente, String idCertificado, CertificadosFiltro filtro) {
@@ -44,7 +50,7 @@ public class IcatuCertificadosClient {
                         .defaultIfEmpty("")
                         .map(body -> new IcatuApiException(response.statusCode(), body)))
                 .bodyToMono(String.class)
-                .map(json -> new CertificadosPayload(CertificadosPayloadTipo.LISTA, json));
+                .map(json -> new CertificadosPayload(CertificadosPayloadTipo.LISTA, readList(json), null, json));
     }
 
     private Mono<CertificadosPayload> buscarDetalhe(String idCliente, String idCertificado) {
@@ -55,6 +61,24 @@ public class IcatuCertificadosClient {
                         .defaultIfEmpty("")
                         .map(body -> new IcatuApiException(response.statusCode(), body)))
                 .bodyToMono(String.class)
-                .map(json -> new CertificadosPayload(CertificadosPayloadTipo.DETALHE, json));
+                .map(json -> new CertificadosPayload(CertificadosPayloadTipo.DETALHE, null, readObject(json), json));
+    }
+
+    private List<Map<String, Object>> readList(String json) {
+        try {
+            return objectMapper.readValue(json, new TypeReference<>() {
+            });
+        } catch (Exception ex) {
+            throw new IllegalStateException("Nao foi possivel ler a lista de certificados retornada pela Icatu.", ex);
+        }
+    }
+
+    private Map<String, Object> readObject(String json) {
+        try {
+            return objectMapper.readValue(json, new TypeReference<>() {
+            });
+        } catch (Exception ex) {
+            throw new IllegalStateException("Nao foi possivel ler o detalhe do certificado retornado pela Icatu.", ex);
+        }
     }
 }
