@@ -30,7 +30,44 @@ public class IcatuCertificadosClient {
         )));
     }
 
+    public Mono<List<CertificadoResumo>> listarCertificadosComSaldo(String idCliente) {
+        return listarCertificados(idCliente, new CertificadosFiltro(
+                null, null, true, null, true, null, null
+        ));
+    }
+
+    public Mono<List<CertificadoResumo>> listarCertificados(String idCliente, CertificadosFiltro filtro) {
+        return getCertificadosJson(idCliente, filtro)
+                .map(this::readCertificados);
+    }
+
+    public Mono<CertificadoDetalhe> detalharCertificado(String idCliente, String idCertificado) {
+        return getCertificadoDetalheJson(idCliente, idCertificado)
+                .map(this::readCertificadoDetalhe);
+    }
+
+    public Mono<List<CertificadoBeneficio>> listarBeneficios(String idCliente, String idCertificado) {
+        return icatuWebClient.get()
+                .uri("/clientes/{idcliente}/certificados/{idcertificado}/produtos/planos/beneficios", idCliente, idCertificado)
+                .retrieve()
+                .onStatus(status -> status.isError(), response -> response.bodyToMono(String.class)
+                        .defaultIfEmpty("")
+                        .map(body -> new IcatuApiException(response.statusCode(), body)))
+                .bodyToMono(String.class)
+                .map(this::readCertificadoBeneficios);
+    }
+
     private Mono<CertificadosPayload> buscarLista(String idCliente, CertificadosFiltro filtro) {
+        return getCertificadosJson(idCliente, filtro)
+                .map(json -> new CertificadosPayload(CertificadosPayloadTipo.LISTA, readCertificados(json), null, json));
+    }
+
+    private Mono<CertificadosPayload> buscarDetalhe(String idCliente, String idCertificado) {
+        return getCertificadoDetalheJson(idCliente, idCertificado)
+                .map(json -> new CertificadosPayload(CertificadosPayloadTipo.DETALHE, null, readCertificadoDetalhe(json), json));
+    }
+
+    private Mono<String> getCertificadosJson(String idCliente, CertificadosFiltro filtro) {
         return icatuWebClient.get()
                 .uri(uriBuilder -> {
                     var builder = uriBuilder
@@ -48,22 +85,20 @@ public class IcatuCertificadosClient {
                 .onStatus(status -> status.isError(), response -> response.bodyToMono(String.class)
                         .defaultIfEmpty("")
                         .map(body -> new IcatuApiException(response.statusCode(), body)))
-                .bodyToMono(String.class)
-                .map(json -> new CertificadosPayload(CertificadosPayloadTipo.LISTA, readList(json), null, json));
+                .bodyToMono(String.class);
     }
 
-    private Mono<CertificadosPayload> buscarDetalhe(String idCliente, String idCertificado) {
+    private Mono<String> getCertificadoDetalheJson(String idCliente, String idCertificado) {
         return icatuWebClient.get()
                 .uri("/clientes/{idcliente}/certificados/{idcertificado}", idCliente, idCertificado)
                 .retrieve()
                 .onStatus(status -> status.isError(), response -> response.bodyToMono(String.class)
                         .defaultIfEmpty("")
                         .map(body -> new IcatuApiException(response.statusCode(), body)))
-                .bodyToMono(String.class)
-                .map(json -> new CertificadosPayload(CertificadosPayloadTipo.DETALHE, null, readObject(json), json));
+                .bodyToMono(String.class);
     }
 
-    private List<CertificadoResumo> readList(String json) {
+    private List<CertificadoResumo> readCertificados(String json) {
         try {
             return objectMapper.readValue(json, new TypeReference<>() {
             });
@@ -72,11 +107,20 @@ public class IcatuCertificadosClient {
         }
     }
 
-    private CertificadoDetalhe readObject(String json) {
+    private CertificadoDetalhe readCertificadoDetalhe(String json) {
         try {
             return objectMapper.readValue(json, CertificadoDetalhe.class);
         } catch (Exception ex) {
             throw new IllegalStateException("Nao foi possivel ler o detalhe do certificado retornado pela Icatu.", ex);
+        }
+    }
+
+    private List<CertificadoBeneficio> readCertificadoBeneficios(String json) {
+        try {
+            return objectMapper.readValue(json, new TypeReference<>() {
+            });
+        } catch (Exception ex) {
+            throw new IllegalStateException("Nao foi possivel ler os beneficios do certificado retornados pela Icatu.", ex);
         }
     }
 }

@@ -43,6 +43,9 @@ Até o momento, a aplicacao implementa apenas metodos `GET` do grupo Clientes ->
 | --- | --- | --- | --- |
 | `/clientes/{idcliente}/certificados` | `GET` | `certificados(idCliente, filtro)` | Quando `idCertificado` nao e informado |
 | `/clientes/{idcliente}/certificados/{idcertificado}` | `GET` | `certificados(idCliente, idCertificado)` | Quando `idCertificado` e informado |
+| `/clientes/{idcliente}/certificados?Cliente=true&SaldoReserva=true` | `GET` | `carteiraPrevidencia(cpf)` | Sempre que a carteira e consultada |
+| `/clientes/{idcliente}/certificados/{idcertificado}` | `GET` | `carteiraPrevidencia(cpf) { certificados { detalhe } }` | Somente quando `detalhe` e selecionado |
+| `/clientes/{idcliente}/certificados/{idcertificado}/produtos/planos/beneficios` | `GET` | `carteiraPrevidencia(cpf) { certificados { beneficios } }` | Somente quando `beneficios` e selecionado |
 
 Headers enviados para a Icatu em todas as chamadas:
 
@@ -62,8 +65,27 @@ type Query {
     idCertificado: String
     filtro: CertificadosFiltroInput
   ): CertificadosPayload!
+
+  carteiraPrevidencia(cpf: String!): CarteiraPrevidencia!
 }
 ```
+
+`certificados` e uma query proxima das rotas da Icatu. `carteiraPrevidencia` e uma query de dominio para montar telas de carteira por CPF.
+
+Na query `carteiraPrevidencia`, a aplicacao sempre chama primeiro:
+
+```http
+GET /clientes/{cpf}/certificados?Cliente=true&SaldoReserva=true
+```
+
+Depois, para cada certificado retornado:
+
+| Campo selecionado no GraphQL | Chamada adicional |
+| --- | --- |
+| `detalhe` | `GET /clientes/{cpf}/certificados/{numeroCertificado}` |
+| `beneficios` | `GET /clientes/{cpf}/certificados/{numeroCertificado}/produtos/planos/beneficios` |
+
+Se `detalhe` ou `beneficios` nao forem selecionados na query, essas chamadas adicionais nao sao executadas.
 
 ### Filtros da lista
 
@@ -162,6 +184,70 @@ certificado {
 ```
 
 ## Exemplos
+
+### Carteira por CPF
+
+Consulta apenas dados basicos e saldo. Executa somente a rota de lista de certificados:
+
+```graphql
+query {
+  carteiraPrevidencia(cpf: "12345678901") {
+    cpf
+    certificados {
+      numeroCertificado
+      nome
+      statusCertificado
+      saldoValor {
+        dataSaldo
+        total
+      }
+    }
+  }
+}
+```
+
+Consulta dados para uma tela de cards com plano, fundo, tipo e beneficios. Executa a lista e, por certificado, as rotas de detalhe e beneficios:
+
+```graphql
+query {
+  carteiraPrevidencia(cpf: "12345678901") {
+    certificados {
+      numeroCertificado
+      saldoValor {
+        total
+      }
+      detalhe {
+        produto {
+          nome
+          nomeComercial
+          plano {
+            tipoPlano
+            nome
+            beneficios {
+              nome
+              tipo
+              fundos {
+                nome
+                tipoFundo
+                estrategiaFundo
+              }
+            }
+          }
+        }
+      }
+      beneficios {
+        codigo
+        nome
+        tipo
+        valorContribuicao
+        valorCapitalSegurado
+      }
+    }
+  }
+}
+```
+
+### Rotas Icatu diretas
 
 Sem `idCertificado`, consulta a lista em `GET /clientes/{idcliente}/certificados`:
 

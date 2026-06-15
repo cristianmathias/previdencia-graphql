@@ -4,6 +4,8 @@ type Query {
     idCertificado: String
     filtro: CertificadosFiltroInput
   ): CertificadosPayload!
+
+  carteiraPrevidencia(cpf: String!): CarteiraPrevidencia!
 }
 
 input CertificadosFiltroInput {
@@ -35,6 +37,23 @@ type CertificadoResumo {
   statusCertificado: String
   motivo: [String!]
   saldoValor: [SaldoValor!]
+}
+
+type CarteiraPrevidencia {
+  cpf: String!
+  certificados: [CertificadoCarteira!]!
+}
+
+type CertificadoCarteira {
+  cpf: String!
+  nome: String
+  matricula: String
+  numeroCertificado: String
+  statusCertificado: String
+  motivo: [String!]
+  saldoValor: [SaldoValor!]
+  detalhe: CertificadoDetalhe
+  beneficios: [CertificadoBeneficio!]
 }
 
 type SaldoValor {
@@ -186,6 +205,27 @@ type Beneficio {
   fatorAtualDeRenda: String
   fundos: [Fundo!]
   tipoContas: [TipoConta!]
+}
+
+type CertificadoBeneficio {
+  codigo: String
+  nome: String
+  tipo: String
+  valorContribuicao: Float
+  valorCapitalSegurado: Float
+  indiceAtualizacaoMonetaria: String
+  intervaloCorrecao: String
+  defasagemMeses: String
+  beneficiarios: [CertificadoBeneficiario!]
+}
+
+type CertificadoBeneficiario {
+  nome: String
+  cpf: String
+  dataNascimento: String
+  idParentesco: Int
+  grauParentesco: String
+  percentualDistribuicao: Float
 }
 
 type TipoConta {
