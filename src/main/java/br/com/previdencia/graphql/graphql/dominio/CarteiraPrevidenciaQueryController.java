@@ -1,8 +1,8 @@
-package br.com.previdencia.graphql.graphql;
+package br.com.previdencia.graphql.graphql.dominio;
 
-import br.com.previdencia.graphql.icatu.CarteiraPrevidencia;
+import br.com.previdencia.graphql.dominio.CarteiraPrevidencia;
+import br.com.previdencia.graphql.dominio.CertificadoCarteira;
 import br.com.previdencia.graphql.icatu.CertificadoBeneficio;
-import br.com.previdencia.graphql.icatu.CertificadoCarteira;
 import br.com.previdencia.graphql.icatu.CertificadoDetalhe;
 import br.com.previdencia.graphql.icatu.IcatuCertificadosClient;
 import java.util.List;

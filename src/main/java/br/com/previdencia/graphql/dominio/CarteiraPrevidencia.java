@@ -1,4 +1,4 @@
-package br.com.previdencia.graphql.icatu;
+package br.com.previdencia.graphql.dominio;
 
 import java.util.List;
 

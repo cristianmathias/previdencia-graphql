@@ -1,9 +1,18 @@
 type Query {
-  certificados(
+  icatuCertificados(
     idCliente: String!
-    idCertificado: String
     filtro: CertificadosFiltroInput
-  ): CertificadosPayload!
+  ): [CertificadoResumo!]!
+
+  icatuCertificado(
+    idCliente: String!
+    idCertificado: String!
+  ): CertificadoDetalhe!
+
+  icatuCertificadoBeneficios(
+    idCliente: String!
+    idCertificado: String!
+  ): [CertificadoBeneficio!]!
 
   carteiraPrevidencia(cpf: String!): CarteiraPrevidencia!
 }
@@ -16,18 +25,6 @@ input CertificadosFiltroInput {
   saldoReserva: Boolean
   periodoAcumuladoInicio: String
   periodoAcumuladoFim: String
-}
-
-type CertificadosPayload {
-  tipo: CertificadosPayloadTipo!
-  certificados: [CertificadoResumo!]
-  certificado: CertificadoDetalhe
-  json: String!
-}
-
-enum CertificadosPayloadTipo {
-  LISTA
-  DETALHE
 }
 
 type CertificadoResumo {

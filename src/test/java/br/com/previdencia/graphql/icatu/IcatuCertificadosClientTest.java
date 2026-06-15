@@ -17,22 +17,19 @@ class IcatuCertificadosClientTest {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
-    void deveConsultarListaQuandoIdCertificadoNaoForInformado() {
+    void deveConsultarListaDeCertificados() {
         CapturingExchangeFunction exchange = new CapturingExchangeFunction("[{\"numeroCertificado\":\"000000000001\"}]");
         var client = new IcatuCertificadosClient(WebClient.builder()
                 .baseUrl("https://api-sandbox.icatuseguros.com.br/relacionamento-parceiro/previdencia/v3")
                 .exchangeFunction(exchange)
                 .build(), objectMapper);
 
-        StepVerifier.create(client.buscar("12345678901", null, new CertificadosFiltro(
+        StepVerifier.create(client.listarCertificados("12345678901", new CertificadosFiltro(
                         "RESGATE", "123", true, "999", true, "2026-01-01", "2026-01-31"
                 )))
-                .assertNext(payload -> {
-                    assertThat(payload.tipo()).isEqualTo(CertificadosPayloadTipo.LISTA);
-                    assertThat(payload.certificados()).hasSize(1);
-                    assertThat(payload.certificados().getFirst().numeroCertificado()).isEqualTo("000000000001");
-                    assertThat(payload.certificado()).isNull();
-                    assertThat(payload.json()).contains("numeroCertificado");
+                .assertNext(certificados -> {
+                    assertThat(certificados).hasSize(1);
+                    assertThat(certificados.getFirst().numeroCertificado()).isEqualTo("000000000001");
                     assertThat(exchange.uri().getPath()).isEqualTo("/relacionamento-parceiro/previdencia/v3/clientes/12345678901/certificados");
                     assertThat(exchange.uri().getQuery()).contains("FormaElegibilidade=RESGATE");
                     assertThat(exchange.uri().getQuery()).contains("Cliente=true");
@@ -42,20 +39,35 @@ class IcatuCertificadosClientTest {
     }
 
     @Test
-    void deveConsultarDetalheQuandoIdCertificadoForInformado() {
+    void deveConsultarDetalheDoCertificado() {
         CapturingExchangeFunction exchange = new CapturingExchangeFunction("{\"statusCertificado\":\"ATIVO\"}");
         var client = new IcatuCertificadosClient(WebClient.builder()
                 .baseUrl("https://api-sandbox.icatuseguros.com.br/relacionamento-parceiro/previdencia/v3")
                 .exchangeFunction(exchange)
                 .build(), objectMapper);
 
-        StepVerifier.create(client.buscar("12345678901", "000000000001", null))
-                .assertNext(payload -> {
-                    assertThat(payload.tipo()).isEqualTo(CertificadosPayloadTipo.DETALHE);
-                    assertThat(payload.certificados()).isNull();
-                    assertThat(payload.certificado().statusCertificado()).isEqualTo("ATIVO");
-                    assertThat(payload.json()).contains("ATIVO");
+        StepVerifier.create(client.detalharCertificado("12345678901", "000000000001"))
+                .assertNext(certificado -> {
+                    assertThat(certificado.statusCertificado()).isEqualTo("ATIVO");
                     assertThat(exchange.uri().getPath()).isEqualTo("/relacionamento-parceiro/previdencia/v3/clientes/12345678901/certificados/000000000001");
+                    assertThat(exchange.uri().getQuery()).isNull();
+                })
+                .verifyComplete();
+    }
+
+    @Test
+    void deveConsultarBeneficiosDoCertificado() {
+        CapturingExchangeFunction exchange = new CapturingExchangeFunction("[{\"codigo\":\"001\",\"nome\":\"Sobrevivencia\"}]");
+        var client = new IcatuCertificadosClient(WebClient.builder()
+                .baseUrl("https://api-sandbox.icatuseguros.com.br/relacionamento-parceiro/previdencia/v3")
+                .exchangeFunction(exchange)
+                .build(), objectMapper);
+
+        StepVerifier.create(client.listarBeneficios("12345678901", "000000000001"))
+                .assertNext(beneficios -> {
+                    assertThat(beneficios).hasSize(1);
+                    assertThat(beneficios.getFirst().codigo()).isEqualTo("001");
+                    assertThat(exchange.uri().getPath()).isEqualTo("/relacionamento-parceiro/previdencia/v3/clientes/12345678901/certificados/000000000001/produtos/planos/beneficios");
                     assertThat(exchange.uri().getQuery()).isNull();
                 })
                 .verifyComplete();

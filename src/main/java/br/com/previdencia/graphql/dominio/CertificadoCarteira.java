@@ -1,5 +1,7 @@
-package br.com.previdencia.graphql.icatu;
+package br.com.previdencia.graphql.dominio;
 
+import br.com.previdencia.graphql.icatu.CertificadoResumo;
+import br.com.previdencia.graphql.icatu.SaldoValor;
 import java.util.List;
 
 public record CertificadoCarteira(

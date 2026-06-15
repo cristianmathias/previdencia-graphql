@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
@@ -20,16 +19,6 @@ public class IcatuCertificadosClient {
         this.objectMapper = objectMapper;
     }
 
-    public Mono<CertificadosPayload> buscar(String idCliente, String idCertificado, CertificadosFiltro filtro) {
-        if (StringUtils.hasText(idCertificado)) {
-            return buscarDetalhe(idCliente, idCertificado);
-        }
-
-        return buscarLista(idCliente, Optional.ofNullable(filtro).orElse(new CertificadosFiltro(
-                null, null, null, null, null, null, null
-        )));
-    }
-
     public Mono<List<CertificadoResumo>> listarCertificadosComSaldo(String idCliente) {
         return listarCertificados(idCliente, new CertificadosFiltro(
                 null, null, true, null, true, null, null
@@ -37,7 +26,9 @@ public class IcatuCertificadosClient {
     }
 
     public Mono<List<CertificadoResumo>> listarCertificados(String idCliente, CertificadosFiltro filtro) {
-        return getCertificadosJson(idCliente, filtro)
+        return getCertificadosJson(idCliente, Optional.ofNullable(filtro).orElse(new CertificadosFiltro(
+                        null, null, null, null, null, null, null
+                )))
                 .map(this::readCertificados);
     }
 
@@ -55,16 +46,6 @@ public class IcatuCertificadosClient {
                         .map(body -> new IcatuApiException(response.statusCode(), body)))
                 .bodyToMono(String.class)
                 .map(this::readCertificadoBeneficios);
-    }
-
-    private Mono<CertificadosPayload> buscarLista(String idCliente, CertificadosFiltro filtro) {
-        return getCertificadosJson(idCliente, filtro)
-                .map(json -> new CertificadosPayload(CertificadosPayloadTipo.LISTA, readCertificados(json), null, json));
-    }
-
-    private Mono<CertificadosPayload> buscarDetalhe(String idCliente, String idCertificado) {
-        return getCertificadoDetalheJson(idCliente, idCertificado)
-                .map(json -> new CertificadosPayload(CertificadosPayloadTipo.DETALHE, null, readCertificadoDetalhe(json), json));
     }
 
     private Mono<String> getCertificadosJson(String idCliente, CertificadosFiltro filtro) {
