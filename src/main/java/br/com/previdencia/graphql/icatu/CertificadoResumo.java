@@ -8,6 +8,6 @@ public record CertificadoResumo(
         String numeroCertificado,
         String statusCertificado,
         List<String> motivo,
-        List<SaldoValor> saldoValor
+        SaldoValor saldoValor
 ) {
 }

@@ -33,7 +33,7 @@ type CertificadoResumo {
   numeroCertificado: String
   statusCertificado: String
   motivo: [String!]
-  saldoValor: [SaldoValor!]
+  saldoValor: SaldoValor
 }
 
 type CarteiraPrevidencia {
@@ -48,7 +48,7 @@ type CertificadoCarteira {
   numeroCertificado: String
   statusCertificado: String
   motivo: [String!]
-  saldoValor: [SaldoValor!]
+  saldoValor: SaldoValor
   detalhe: CertificadoDetalhe
   beneficios: [CertificadoBeneficio!]
 }

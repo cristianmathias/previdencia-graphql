@@ -29,7 +29,7 @@ public record CertificadoCarteira(
         return resumo.motivo();
     }
 
-    public List<SaldoValor> saldoValor() {
+    public SaldoValor saldoValor() {
         return resumo.saldoValor();
     }
 }
